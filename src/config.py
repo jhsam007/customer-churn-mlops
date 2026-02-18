@@ -13,7 +13,7 @@ class DataConfig:
 
 @dataclass
 class ModelConfig:
-    model_type: str = "xgboost"  # "logistic" | "xgboost"
+    model_type: str = "logistic"  # "logistic" | "xgboost"
     random_state: int = 42
 
 

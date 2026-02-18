@@ -1,340 +1,366 @@
-Customer Churn Prediction System (Production-Grade MLOps)
+# Customer Churn Prediction System (Production-Grade MLOps)
+# 顧客チャーン予測システム（プロダクション対応MLOps）
 
 An end-to-end, production-ready machine learning system for predicting customer churn using structured telecom data.
 
-This project demonstrates a complete ML lifecycle implementation — from data preprocessing to deployment — following MLOps best practices.
+構造化された通信データを用いて顧客の解約（チャーン）を予測する、エンドツーエンドの本番環境対応機械学習システムです。
 
-Business Problem
+This project demonstrates a complete ML lifecycle — from data preprocessing to containerized deployment — following MLOps best practices.
+
+本プロジェクトは、データ前処理からコンテナ化されたデプロイメントまで、MLOpsのベストプラクティスに基づいた完全なMLライフサイクルを実装しています。
+
+
+---
+## Live System Preview
+
+<p align="center">
+  <img src="assets/swagger_ui.png" width="800"/>
+</p>
+
+---
+
+## Business Problem
+## ビジネス課題
 
 Customer churn significantly impacts subscription-based businesses and recurring revenue models.
 
+サブスクリプション型ビジネスにおいて、顧客の解約は収益に大きな影響を与えます。
+
 Early identification of high-risk customers enables:
+- Targeted retention strategies
+- Reduced revenue loss
+- Improved customer lifetime value (CLV)
 
-Targeted retention strategies
+解約リスクの高い顧客を早期に特定することで、以下が可能になります：
 
-Reduced revenue loss
+- 効果的なリテンション施策
+- 収益損失の削減
+- 顧客生涯価値（CLV）の向上
 
-Improved customer lifetime value (CLV)
+This system predicts churn probability and applies configurable business thresholds to support practical decision-making.
 
-This system predicts the probability of customer churn and applies configurable business decision logic to generate actionable churn labels.
+本システムは解約確率を予測し、ビジネス要件に応じた閾値設定により実用的な意思決定を支援します。
 
-Key Features
+---
 
-End-to-end ML pipeline (training → evaluation → deployment)
+## Key Features  
+## 主な特徴
 
-Experiment tracking with MLflow
+- End-to-end ML pipeline (training → evaluation → deployment)  
+  学習から評価、デプロイまでを含むエンドツーエンドのMLパイプライン
 
-Model versioning and registry
+- Hyperparameter tuning with Optuna (30 trials)  
+  Optunaを用いたハイパーパラメータ最適化（30試行）
 
-Configurable decision threshold layer
+- Experiment tracking with MLflow  
+  MLflowによる実験管理・モデル管理
 
-Model explainability using SHAP
+- Configurable decision threshold layer  
+  ビジネス要件に応じて調整可能な意思決定閾値レイヤー
 
-REST API serving with FastAPI
+- Model explainability using SHAP  
+  SHAPによるモデルの解釈性・特徴量重要度の可視化
 
-Docker containerization
+- REST API serving with FastAPI + Swagger UI  
+  FastAPIによる推論API構築およびSwagger UIによる自動ドキュメント生成
 
-CI/CD with GitHub Actions
+- Docker containerization  
+  Dockerによるコンテナ化（本番環境を想定）
 
-Unit testing with Pytest
+- CI/CD with GitHub Actions  
+  GitHub ActionsによるCI/CD自動化
 
-Reproducible and modular project structure
+- Unit testing with Pytest (7/7 passing, 68% coverage)  
+  Pytestによる単体テスト実装（7/7成功、カバレッジ68%）
 
-System Architecture
+- Reproducible and modular project structure  
+  再現性および拡張性を考慮したモジュール設計
 
-                ┌──────────────────┐
-                │  Raw CSV Dataset │
-                └──────────┬───────┘
-                           │
-                    Data Loader
-                           │
-                    Preprocessing
-                           │
-                      ML Pipeline
-                           │
-                    MLflow Tracking
-                           │
-               Model Registry (Versioned)
-                           │
-                   Probability Output
-                           │
-              Decision Layer (Threshold)
-                           │
-                 Explainability (SHAP)
-                           │
-                   FastAPI Inference
-                           │
-                     Docker Container
 
-Architectural Design Principles
+---
+---
 
-Separation of prediction and business decision logic
+## 📂 Dataset
+## 📂 データセット
 
-Centralized configuration management
+This project uses the IBM Telco Customer Churn Dataset.
 
-Version-controlled model artifacts
+本プロジェクトでは、IBM Telco Customer Churn Dataset を使用しています。
 
-Reproducible training and inference pipeline
+- Records: 7,043 customers  
+- Features: 20+ structured attributes  
+- Target Variable: `Churn` (Yes/No)  
+- Churn Rate: ~26.5%
 
-Production-ready API serving
+- レコード数：7,043件  
+- 特徴量：20以上の構造化データ  
+- 目的変数：`Churn`（解約有無）  
+- 解約率：約26.5%
 
-Model Explainability
+### Data Characteristics
+### データ特性
 
-Model interpretability is implemented using SHAP.
+- Mixture of categorical and numerical variables  
+- Imbalanced binary classification problem  
+- Requires preprocessing and encoding  
 
-Capabilities:
+- カテゴリ変数と数値変数の混在  
+- 不均衡な二値分類問題  
+- 前処理およびエンコーディングが必要  
 
-Global feature importance analysis
 
-Local explanation for individual predictions
+## System Architecture
 
-Business insight extraction
+```
+Raw CSV Dataset
+      ↓
+Data Loader
+      ↓
+Preprocessing (ColumnTransformer)
+      ↓
+ML Pipeline (XGBoost / Logistic Regression)
+      ↓
+MLflow Experiment Tracking
+      ↓
+Probability Output
+      ↓
+Decision Layer (Configurable Threshold)
+      ↓
+Explainability (SHAP)
+      ↓
+FastAPI Inference
+      ↓
+Docker Container
+```
 
-Transparent decision support
+---
 
-Explainability improves trust, auditability, and real-world usability of the system.
+## Model Performance
 
-Model Performance
+| Model | ROC-AUC | Precision | Recall | F1 |
+|-------|---------|-----------|--------|-----|
+| XGBoost | 0.847 | 0.59 | 0.663 | 0.624 |
+| Logistic | 0.842 | 0.568 | 0.668 | 0.614 |
 
-Algorithms:
+**Selected model:** XGBoost with decision threshold tuned to `0.4`
 
-Logistic Regression
+| Threshold | Recall | Precision |
+|-----------|--------|-----------|
+| 0.5 | 54.8% | 63.5% |
+| 0.4 ✅ | 66.3% | 59.0% |
+| 0.3 | 74.9% | 52.6% |
 
-Random Forest (configurable)
+---
 
-Evaluation Metrics:
+## System Screenshots
 
-ROC-AUC
+### MLflow Experiment Tracking
 
-Precision
+<p align="center">
+  <img src="assets/mlflow_ui.png" width="800"/>
+</p>
 
-Recall
+<p align="center">
+  <em>Experiment comparison and hyperparameter tuning results tracked via MLflow.</em>
+</p>
 
-F1-score
+---
 
-(Replace with actual metrics from your experiments.)
+### FastAPI Swagger Documentation
 
-Testing
+<p align="center">
+  <img src="assets/swagger_ui.png" width="800"/>
+</p>
 
-Unit tests cover:
+<p align="center">
+  <em>Interactive REST API documentation auto-generated by FastAPI.</em>
+</p>
 
-Data preprocessing
+---
 
-Model training
+### SHAP Feature Importance
 
-Pipeline integration
+<p align="center">
+  <img src="assets/shap_plot.png" width="700"/>
+</p>
 
-Decision threshold logic
+<p align="center">
+  <em>Global feature importance using SHAP explainability.</em>
+</p>
 
-Configuration consistency
+---
 
-Run tests:
+### Confusion Matrix
 
-pytest
+<p align="center">
+  <img src="assets/confusion_matrix.png" width="600"/>
+</p>
 
-Tech Stack
+<p align="center">
+  <em>Model performance visualization at decision threshold 0.4.</em>
+</p>
 
-| Category         | Tools          |
-| ---------------- | -------------- |
-| Language         | Python 3.10    |
-| ML               | scikit-learn   |
-| Explainability   | SHAP           |
-| Tracking         | MLflow         |
-| API              | FastAPI        |
-| Serving          | Uvicorn        |
-| Testing          | Pytest         |
-| CI/CD            | GitHub Actions |
-| Containerization | Docker         |
 
-Project Structure
+---
 
+## Tech Stack
+
+| Category | Tools |
+|----------|-------|
+| Language | Python 3.10 |
+| ML | scikit-learn, XGBoost |
+| Tuning | Optuna |
+| Explainability | SHAP |
+| Tracking | MLflow |
+| API | FastAPI |
+| Serving | Uvicorn |
+| Testing | Pytest |
+| CI/CD | GitHub Actions |
+| Containerization | Docker |
+
+---
+
+## Project Structure
+
+```
 customer-churn/
+├── assets/
+│   ├── mlflow_ui.png
+│   ├── swagger_ui.png
+│   ├── shap_plot.png
+│   └── confusion_matrix.png
 ├── src/
-│   └── customer_churn/
+│   ├── config.py
+│   ├── data_loader.py
+│   ├── preprocessing.py
+│   ├── modeling.py
+│   ├── evaluation.py
+│   ├── decision.py
+│   ├── explainability.py
+│   ├── pipeline.py
+│   └── utils.py
 ├── tests/
+│   ├── test_decision.py
+│   ├── test_modeling.py
+│   ├── test_pipeline.py
+│   └── test_preprocessing.py
 ├── notebooks/
+│   ├── 01_eda.ipynb
+│   ├── 02_experiments.ipynb
+│   ├── 03_model_explainability.ipynb
+│   └── 04_evaluation.ipynb
 ├── models/
-├── .github/workflows/
+├── data/
+│   └── raw/
 ├── app.py
 ├── Dockerfile
-├── Makefile
-└── pyproject.toml
+├── pyproject.toml
+└── README.md
+```
 
-How to Run
+---
 
-1️⃣ Install Dependencies
+## How to Run
+
+### 1. Install Dependencies
+```bash
 pip install -e .[dev]
+```
 
-2️⃣ Train the Model
-python -m src.customer_churn.pipeline
+### 2. Train the Model
+```bash
+python src/pipeline.py
+```
 
-3️⃣ Run the API
+### 3. Launch MLflow UI
+```bash
+mlflow ui
+```
+Open: http://127.0.0.1:5000
+
+### 4. Run the API
+```bash
 uvicorn app:app --reload
+```
+- API: http://127.0.0.1:8000
+- Swagger UI: http://127.0.0.1:8000/docs
 
-
-API will be available at:
-
-http://localhost:8000
-
-4️⃣ Run with Docker
-
-Build image:
-
+### 5. Run with Docker
+```bash
 docker build -t churn-api .
-
-
-Run container:
-
 docker run -p 8000:8000 churn-api
+```
 
-🔄 CI/CD
-
-GitHub Actions automatically runs:
-
-Unit tests
-
-Linting
-
-Coverage checks
-
-Ensuring code quality and reliability on every push.
-
-Model Registry
-
-Models are logged and versioned using MLflow Model Registry.
-
-Each training run stores:
-
-Parameters
-
-Metrics
-
-Artifacts
-
-Serialized pipeline
-
-This enables reproducibility and production deployment management.
-
-Production Considerations
-
-Configurable decision threshold for business flexibility
-
-Clear separation between probability prediction and decision policy
-
-Explainability integrated for compliance and transparency
-
-Containerized deployment for portability
-
-Modular structure for scalability
-
-👤 Author
-
-Hasan Jahid
-ハサン・ジャヒド
-🇯🇵 日本語版
-顧客解約予測システム（本番運用対応・MLOps設計）
-
-本プロジェクトは、通信業界の顧客データを用いた解約予測モデルを構築し、
-本番運用を想定したエンドツーエンドの機械学習システムを実装したものです。
-
-データ前処理からAPIデプロイまで、
-MLライフサイクル全体をMLOpsベストプラクティスに基づいて設計しています。
-
-ビジネス課題
-
-顧客解約（Churn）は、サブスクリプション型ビジネスにおいて
-収益に大きな影響を与える重要指標です。
-
-本システムは：
-
-解約確率の予測
-
-設定可能な閾値による意思決定
-
-解約リスクの可視化
-
-を実現します。
-
-主な特徴
-
-再現性のあるMLパイプライン設計
-
-MLflowによる実験管理・モデル管理
-
-設定可能な閾値ロジック（Decision Layer）
-
-SHAPによるモデル解釈性
-
-FastAPIによるREST API提供
-
-Dockerによるコンテナ化
-
-GitHub ActionsによるCI/CD
-
-Pytestによるユニットテスト
-
-システム構成
-
-CSVデータ
-   ↓
-データ読み込み
-   ↓
-前処理
-   ↓
-機械学習パイプライン
-   ↓
-MLflow実験管理
-   ↓
-モデルレジストリ
-   ↓
-確率出力
-   ↓
-閾値判定（Decision Layer）
-   ↓
-SHAPによる説明
-   ↓
-FastAPI推論API
-   ↓
-Dockerコンテナ
-
-モデル解釈性（Explainability）
-
-SHAPを用いて以下を実現：
-
-特徴量の重要度分析
-
-個別予測の説明
-
-ビジネスインサイト抽出
-
-予測結果の透明性向上
-
-実務利用を想定した説明可能なAI設計です。
-
-テスト
-
-以下を対象にユニットテストを実装：
-
-前処理
-
-モデル学習
-
-パイプライン統合
-
-閾値ロジック
-
-設定値整合性確認
-
+### 6. Run Tests
+```bash
 pytest
+pytest --cov=src  # with coverage
+```
 
-本番運用を想定した設計
+---
 
-予測と意思決定ロジックの分離
+## API Usage
 
-モデルのバージョン管理
+**POST** `/predict`
 
-コンテナベースのデプロイ
+```json
+{
+  "gender": "Female",
+  "SeniorCitizen": 0,
+  "Partner": "Yes",
+  "Dependents": "No",
+  "tenure": 5,
+  "PhoneService": "Yes",
+  "MultipleLines": "No",
+  "InternetService": "Fiber optic",
+  "OnlineSecurity": "No",
+  "OnlineBackup": "Yes",
+  "DeviceProtection": "No",
+  "TechSupport": "No",
+  "StreamingTV": "Yes",
+  "StreamingMovies": "Yes",
+  "Contract": "Month-to-month",
+  "PaperlessBilling": "Yes",
+  "PaymentMethod": "Electronic check",
+  "MonthlyCharges": 89.5,
+  "TotalCharges": 450.3
+}
+```
 
-スケーラブルな構成
+**Response:**
+```json
+{
+  "churn_probability": 0.755,
+  "decision_threshold": 0.4,
+  "churn_label": 1
+}
+```
 
-再現性のある実験管理
+---
+
+## CI/CD
+
+GitHub Actions automatically runs on every push:
+- Unit tests
+- Coverage checks
+
+---
+---
+
+## 🇯🇵 日本語概要
+
+本プロジェクトは、実務を想定したMLOps構成の機械学習システムです。
+
+- XGBoostおよびロジスティック回帰による分類モデル構築
+- Optunaによるハイパーパラメータ最適化
+- MLflowによる実験管理
+- SHAPによるモデル解釈性の可視化
+- FastAPIによるREST API化
+- Dockerによるコンテナ化
+- GitHub ActionsによるCI/CD
+
+データ分析から本番運用を想定したAPI提供まで、一貫した機械学習パイプラインを実装しています。
+
+## Author
+
+**Hasan Jahid**
